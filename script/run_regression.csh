@@ -8,8 +8,7 @@ source /CMC/scripts/mentor.questasim.2020.1_1.csh
 set rootdir = `dirname $0`
 set rootdir = `cd $rootdir && pwd`
 chmod u+x $rootdir/run_regression.csh
-set f_file = $rootdir/lab4.f
-set vsim_do = $rootdir/lab4.do
+set f_file = $rootdir/UVM.f
 
 set script_name = $0:t
 
