@@ -1,0 +1,159 @@
+Ibrahim Touqani 
+NSID:ibt890
+
+
+********************************************************************************
+3 options to run :
+        "<PATH TO FILE>/run_regression.csh"
+                this will run regression test for all test cases I made 
+
+        "<PATH TO FILE>/run_regression.csh -l"
+                this will give the list of all available test that I made and I can run  
+
+        "<PATH TO FILE>/run_regression.csh -t <test_name>"
+                this will run individual test case by calling the name of the test in <test_name> to prform a single run for that test 
+                ex:  run_regression.csh -t <sanity_check>
+
+********************************************************************************
+
+
+
+List of Design Features
+----------------------------------------
+ID:Design Feature
+----------------------------------------
+1: After reseting waiting for rcv_rdy to be 4'b1111 sw we cann start sending inputs 
+
+2: valid_in: in order to make the switch able read the data_in and addr_in we have to assign valid_in to 4'b111 first 
+
+3: loading data example:
+        if data_in = 16'Habcd and addr_in = 16'H0123
+        then out but should be data_out = 16'Hdcba and addr_out = 16'H3210
+
+4: Sending data on posedg #4 as example we should expext the out put to be shown in posedge #5. 
+
+5: Reading: after we send the data inside the switch we now wait data_rdy to be 4'b1111 then we will be able to read
+         the data out 
+
+6: resting is also one future of this switch:
+                when the reset is high then the DUT will reset its all values and delete all stored data insid it. 
+
+
+
+
+I made only one Covergroup that have all Coverpoints and it called cg_cov
+
+
+
+List of Constraints
+----------------------------------------
+ID:Constraints
+----------------------------------------
+1: valid_addresses{
+        addr_in[3:0]   < 4;
+        addr_in[7:4]   < 4;
+        addr_in[11:8]  < 4;
+        addr_in[15:12] < 4;}
+
+        This constraint guarantees the presence of a valid destination port for each source port. 
+        Each nibble of the address 'in' must not exceed 3, as only 4 destination ports (0, 1, 2, 3) are available.
+
+
+2: overlapping_constraint{
+        unique {addr_in[3:0], addr_in[7:4], addr_in[11:8], addr_in[15:12]}}
+        
+        This constraint is utilized to test in an environment where no port conflicts will be overlapped.
+
+
+
+List of Test cases:
+
+  1 : sanity_check
+  2 : no_overlapping_check
+  3 : random
+  4 : overlapping_check
+  5 : all_input_zero
+  6 : all_input_f
+  7 : small_data_in
+
+----------------------------------------
+ID:Task	Description
+----------------------------------------
+1:reset_test:
+        make all outout of test bench to be 0 when the reset flag that coming from top module is 1
+
+2:sanity_check
+        this will generate a random tast cases to check connection to dut 
+
+4:no_overlapping_check
+        this is to do random tests that have consists that will not allowed the addreses to have same numbers 
+
+3:random 
+        this will generate a random tast cases that gonna test the dut 
+
+5:overlapping_check
+        this is to do random tests that have consists that will allowed the addreses to have same numbers 
+
+6:all_input_zero
+        this test case I genrated to make the low bin of data hit where the random gen is never rich that point 
+
+7:all_input_f
+        this test case I genrated to make the max bin of data hit where the random gen is never rich that point 
+
+8:small_data_in
+        this test case I genrated to make the second bin of data hit where the random gen is making big values so that point never get hit  
+
+
+List of Coverpoints
+----------------------------------------
+ID:Description
+----------------------------------------
+1: data_in and data_out:
+        This description applies to both Coverpoints. 
+        There are two bins that correspond to the edge points: 
+                one with the minimum value, and the other with the maximum value. 
+                Additionally, there are four bins that cover specific sections among the 16 bits,
+                ranging from 16'h0001 to 16'hfffe. It's important to note that the two missing 
+                values are already included in the minimum and maximum value bins.
+
+2: addr_in and addr_out:
+
+        This description applies to all Coverpoints under the two logic components, addr_in and addr_out.
+        For addr_in, there are four coverpoints, each covering one port, and they are designed for 4 bits each, 
+        considering the entire 16-bit data. Each coverpoint consists of one valid bin and one illegal bin.
+        The valid bin has specific valid values, which in this case are 0, 1, 2, and 3. 
+        The illegal bin, on the other hand, has all other values, ranging from 4 to F in hexadecimal. 
+        These coverpoints are then applied similarly to the remaining addr_in components, 
+        specifically [3:0], [7:4], [11:8], and [15:12], ensuring complete coverage of all bits within that logic.
+
+        The same approach is applied to addr_out.
+
+3: crosing the Coverpoints of the addr_in and data_in
+
+4:rcv_rdy:
+        2 bins to cover edges bin min and max
+        the the main bin that cover what betwen bin min and bin max 
+        2 other bins to chech falling and raising transations 
+        
+5:data_rdy:
+       bin that contain all values for 4 bits number 
+        
+6:data_read:
+       bin that contain all values for 4 bits number 
+
+
+7:valid_in:
+        2 bins to cover edges bin min and max
+        the the main bin that cover what betwen bin min and bin max 
+        2 other bins to chech falling and raising transations 
+
+
+Coverage Report Totals BY INSTANCES: Number of Instances 9
+
+    Enabled Coverage              Bins      Hits    Misses    Weight  Coverage
+    ----------------              ----      ----    ------    ------  --------
+    Assertions                       5         5         0         1   100.00%
+    Covergroups                      1        na        na         1   100.00%
+        Coverpoints/Crosses         14        na        na         1        na
+            Covergroup Bins         56        56         0         1   100.00%
+Total coverage (filtered view): 100.00%
